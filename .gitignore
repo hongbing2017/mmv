@@ -1,7 +1,6 @@
 doc
 digitvoice
 *.db
-*.png
 *.jpg
 *.gif
 node_modules/
