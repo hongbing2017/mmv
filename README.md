@@ -38,7 +38,7 @@
 API：https://myfile.link/getcaptcha?skey=xxxx (把xxx替换成你自己的skey)
 
 调用结果：
-```JSON
+```JS
 {
     code:0,
     data:{
