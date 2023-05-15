@@ -1,0 +1,24 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="topTip">
+    本小程序仅用于人机验证，普通用户无需直接使用
+  </view>
+  <scroll-view class="intro" scroll-y="{{true}}">
+    <view class='title'>以下信息适用网站开发者</view>
+    <view class='comment'>通常网站会用图片验证码来验证用户是一个真实人类，防止机器人刷服务，薅羊毛，消耗资源</view>
+    <view class='comment'>随着AI识别能力提高，简单的图片验证码已经被破解，过于复杂的验证码又会让真实用户很难使用。</view>
+    <view class='comment'>但是，用户用微信扫码并唤醒小程序的行为是很难伪造的，因此可以用这个行为来检测用户的真实性。</view>
+    <view class='comment'>原理很简单：小程序在后台给网站按需提供一次性的二维码，用户微信扫码唤醒本小程序，本小程序向网站后台发送通知，网站后台授权前端继续提供服务。</view>
+    <view class='comment'>小程序不需要用户的任何信息，仅仅通知发出的验证二维码被人扫过。</view>
+    <view class='comment'>而网站开发者需要做的就是在本小程序注册自己的服务，并提供一个回调网址。</view>
+    <view class='comment'>人机验证小程序永久免费的服务，所有代码在Github开源。</view>
+
+  </scroll-view>
+  <view class="btn">
+      <t-button class="btn" theme="primary" size="large" catchtap="onRegister">注册服务</t-button>
+    </view>
+   <view class='foot'>{{copyrightInfo}}</view>
+</view>
+<t-popup visible="{{result}}" bind:visible-change="onVisibleChange" placement="center">
+  <t-result style="margin:60rpx;"theme="{{result.theme}}" title="{{result.title}}" description="{{result.description}}" />
+</t-popup>

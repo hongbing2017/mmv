@@ -1,0 +1,57 @@
+/**index.wxss**/
+.container {
+  display: flex;
+  height:100%;
+  flex-direction: column;
+  align-items: center;
+  color: #000;
+  background-color: #002651;
+  position: fixed;
+}
+
+.topTip {
+  flex:none;
+  line-height: 80rpx;
+  border:1px solid #aaa;
+  color:#fff;
+  border-radius: 16rpx;
+  margin: 20rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight:bold;
+}
+
+.intro {
+  flex:auto;
+  padding: 10rpx 30rpx;
+  width: 100%;
+  height: 500rpx;
+  box-sizing: border-box;
+  color:#ddd;
+  font-size: 30rpx;
+}
+
+.title{
+  color: #fff;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 28rpx;
+  font-weight: 400;
+}
+.comment{
+  padding: 10rpx 0;
+}
+
+.btn{
+  width: 500rpx;
+  margin:20rpx auto;
+}
+.foot{
+  height:50rpx;
+  width:100%;
+  box-sizing: border-box;
+  text-align: center;
+  color: #666;
+}

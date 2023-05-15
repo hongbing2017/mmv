@@ -1,0 +1,10 @@
+doc
+digitvoice
+*.db
+*.png
+*.jpg
+*.gif
+node_modules/
+miniprogram_npm/
+.cloudbase/
+doc/

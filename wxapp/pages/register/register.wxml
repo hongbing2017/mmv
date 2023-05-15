@@ -1,0 +1,23 @@
+<!--logs.wxml-->
+<view class="container">
+  <form >
+    <t-input label="" value="服务状态：{{state==0?'正常':'异常'}}" disabled/>
+    <t-input label="网站" data-type="host" value="{{host}}" bindblur="onInput" required placeholder="填写您网站主页" tips="" maxlength="{{100}}" />
+    <t-input label="回调" data-type="callback" value="{{callback}}" bindblur="onInput" required placeholder="举例：https://mysite.com/captcha" />
+  </form>
+  <view class="api">
+  <t-input label="API key" value="{{skey}}" disabled >
+    <t-button slot="suffix"  theme="primary"  size="extra-small"  catch:tap="onCopyAPIKEY"> 复制 </t-button>
+  </t-input>
+  <t-input label="开源地址" value="{{github}}" disabled >
+    <t-button slot="suffix"  theme="primary"  size="extra-small"  catch:tap="onCopyUrl"> 复制 </t-button>
+  </t-input>
+  </view>
+  <view class='comment'>
+  说明：提交后请复制保存好你的API key, 具体如何使用请访问开源项目。 
+  </view>
+ 
+  <view class="btn">
+      <t-button class="btn" theme="primary" size="large" catchtap="onRegister">提交</t-button>
+  </view>
+</view>

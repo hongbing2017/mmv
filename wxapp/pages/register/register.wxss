@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 10rpx;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.btn {
+  margin: 10rpx auto;
+  width: 500rpx;
+}
+
+.api{
+  margin: 10rpx 0;
+  width: 100%;
+}
+
+.comment{
+  flex:auto;
+  height: 300rpx;
+  margin: 10rpx;
+  padding: 10rpx;
+}

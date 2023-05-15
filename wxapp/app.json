@@ -1,0 +1,21 @@
+{
+  "pages":[
+    "pages/index/index",
+    "pages/register/register"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#002651",
+    "navigationBarTitleText": "人机验证",
+    "navigationBarTextStyle":"white"
+  },
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-footer": "tdesign-miniprogram/footer/footer",
+    "t-result": "tdesign-miniprogram/result/result",
+    "t-popup": "tdesign-miniprogram/popup/popup",
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-link": "tdesign-miniprogram/link/link"
+  },
+  "sitemapLocation": "sitemap.json"
+}
