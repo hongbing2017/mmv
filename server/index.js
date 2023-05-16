@@ -41,7 +41,7 @@ let indexhtml= null
 //     }
 //     res.send(indexhtml)
 // })
-app.get("/captcha", async (req, res) => {
+app.get("/mmv/captcha", async (req, res) => {
 
   //测试页面
   if(!testhtml){
