@@ -255,9 +255,10 @@
 
     console.log("_captchaMD5:", _captchaMD5)
 
+    let url = "/mmv/captchaResult?token=" + _captchaMD5
     let t = setInterval(() => {
       //这里只是周期性的询问二维码是否得到验证
-      $.ajax("/mmv/captchaResult?token=" + _captchaMD5, {
+      $.ajax(url, {
         method: "get",
       }).done(function (res) {
         if (res && res.code == 0) {
