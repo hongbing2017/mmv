@@ -112,6 +112,7 @@ let regUrl = /^(http|https):\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(\/[a-zA-Z0-9/_.-]*
 
 // 验证二维码
 app.get("/mmv/verify", async (req, res) => {
+  console.log('验证二维码：',token)
   const { token } = req.query;
   if (!token) {
     return res.send({
@@ -121,6 +122,8 @@ app.get("/mmv/verify", async (req, res) => {
   }
   
   let callbackUrl = await db.verifyCode(token)
+  
+  console.log('二维码回调：',callbackUrl)
 
   if(callbackUrl == 'test'){//测试页面的假回调，
       let r = captchaList.some((item)=>{
