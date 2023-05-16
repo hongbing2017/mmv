@@ -87,6 +87,9 @@ function updateUser(openID, data) {
 function delCode(code){
   return knex('codeList').where('code',code).del()
 }
+function getCode(openID){
+  return knex('codeList').where('openID',openID).select()
+}
 function addCode(code,openID){
   return knex('codeList').insert({
     openid:openID,
@@ -118,5 +121,6 @@ module.exports = {
   updateUser,
   addUser,
   addCode,
-  delCode
+  delCode,
+  getCode
 };

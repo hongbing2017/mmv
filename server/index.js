@@ -34,7 +34,6 @@ var captchaList = []
 
 //测试页面
 
-//console.log("html:",html)
 // 首页
 app.get("/", async (req, res) => {
 
@@ -48,8 +47,8 @@ app.get("/", async (req, res) => {
     callback:'test'
    }
 
-   
-  let user = db.getUserByOpenID(testUser.openID)
+
+  let user = await db.getUserByOpenID(testUser.openID)
   if (!user) {
       await db.addUser(testUser)
   } 
@@ -75,8 +74,7 @@ app.get("/", async (req, res) => {
     t:Date.now()
   })
   res.send(html);
-  //写一个
-
+  
 });
 
 //前端发来询问验证结果
@@ -117,7 +115,7 @@ app.get("/mmv/verify", async (req, res) => {
   if (!token) {
     return res.send({
       code: 1,
-      data: '无效token',
+      data: '无效参数',
     });
   }
   
@@ -128,7 +126,7 @@ app.get("/mmv/verify", async (req, res) => {
   if(callbackUrl == 'test'){//测试页面的假回调，
       let r = captchaList.some((item)=>{
         if(item.scene==token){
-          item.state == 1  //验证通过
+          item.state = 1  //验证通过
           return true
         }
       })

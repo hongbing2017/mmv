@@ -194,12 +194,19 @@
             <small class="card-text"
               style="display: flex; justify-content: center; margin-top: 8px">请用微信扫码验证您是真实用户</small>
           </div>
-          <div id="'result" style="display:none;">
+          <div id="result" style="display:none;">
             <div class="alert alert-success" role="alert">
               <i class="fas fa-check-circle mr-2"></i>验证成功
             </div>
             <small class="card-text"
               style="display: flex; justify-content: center; margin-top: 8px">您可以继续进行下一步操作</small>
+          </div>
+          <div id="timeout" style="display:none;">
+            <div class="alert alert-warning" role="alert">
+              <i class="fas fa-check-circle mr-2"></i>二维码超时过期
+            </div>
+            <small class="card-text"
+              style="display: flex; justify-content: center; margin-top: 8px">请刷新网页重新扫码</small>
           </div>
         </div>
       </div>
@@ -255,18 +262,26 @@
     console.log("_captchaMD5:", _captchaMD5)
 
     let url = "/mmv/captchaResult?token=" + _captchaMD5
+    let n = 0
     let t = setInterval(() => {
       //这里只是周期性的询问二维码是否得到验证
       $.ajax(url, {
         method: "get",
       }).done(function (res) {
-        if (res && res.code == 0) {
+        if (res && res.code == 0 && res.result==1) {
           clearInterval(t)
           $('#qrcode').hide()
+          $('#timeout').hide()
           $('#result').show()
         }
       });
-    }, 1000)
+      n++
+      if(n>40){
+        clearInterval(t)
+        $('#qrcode').hide()
+        $('#timeout').show()
+      }
+    }, 1500)
 
   }
 </script>

@@ -25,6 +25,7 @@ Page({
         });
   
         if (res.statusCode == 200) {
+          console.log()
           if(res.data.code==0){
              console.log('验证成功：', res);
              this.gotoResult('验证成功','success','请返回网站进行下一步操作')
