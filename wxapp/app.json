@@ -1,13 +1,14 @@
 {
-  "pages":[
+  "pages": [
     "pages/index/index",
-    "pages/register/register"
+    "pages/register/register",
+    "pages/result/result"
   ],
-  "window":{
-    "backgroundTextStyle":"light",
+  "window": {
+    "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#002651",
     "navigationBarTitleText": "人机验证",
-    "navigationBarTextStyle":"white"
+    "navigationBarTextStyle": "white"
   },
   "usingComponents": {
     "t-button": "tdesign-miniprogram/button/button",

@@ -3,8 +3,7 @@
 const app = getApp()
 Page({
   data: {
-    copyrightInfo: 'version 1.0.0',
-    result:null
+    copyrightInfo: 'version 1.0.0'    
   },
 
   async onLoad(query) {
@@ -28,48 +27,31 @@ Page({
         if (res.statusCode == 200) {
           if(res.data.code==0){
              console.log('验证成功：', res);
-            this.setData({
-            result:{
-              title:"验证成功",
-              theme:'success',
-              description:'请返回网站继续操作'
-            }
-            })
+             this.gotoResult('验证成功','success','请返回网站进行下一步操作')
+            
           }else{
             console.log('验证失败：', res);
-            this.setData({
-            result:{
-              title:"二维码无效或过期",
-              theme:'error',
-              description:'请刷新二维码重新验证'
-            }
-            })
+            this.gotoResult('二维码无效或过期','error','请刷新二维码重新验证')
           }
          
         }else{
-          this.setData({
-            result:{
-              title:"网络错误",
-              theme:'error',
-              description:'请稍后继续尝试'
-            }
-          })
+          this.gotoResult('网络错误','error','请稍等几秒重新尝试')
         }
       } catch (error) {
         console.log("验证失败：", error)
-        this.setData({
-          result:{
-            title:"验证超时",
-            theme:'error',
-            description:'请重新扫码验证'
-          }
-        })
+        this.gotoResult('验证超时','error','请重新扫描验证')
       }
     }
   },
   onVisibleChange(){
     this.setData({
       result:null
+    })
+  },
+  gotoResult(title,theme,description){
+
+    wx.navigateTo({
+      url:`../result/result?title=${title}&theme=${theme}&description=${description}`
     })
   },
   async onRegister() {

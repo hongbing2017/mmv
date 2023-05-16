@@ -122,12 +122,23 @@ app.get("/mmv/verify", async (req, res) => {
   let callbackUrl = await db.verifyCode(token)
 
   if(callbackUrl == 'test'){//测试页面的假回调，
-      captchaList.some((item)=>{
+      let r = captchaList.some((item)=>{
         if(item.scene==token){
           item.state == 1  //验证通过
           return true
         }
       })
+      if(r){
+        return res.send({
+          code: 0,
+          data: '验证成功'
+        });
+      }else{
+        return res.send({
+          code: 1,
+          data: '无效token'
+        });
+      }
       return 
   }
   else if (callbackUrl) {

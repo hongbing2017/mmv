@@ -1,0 +1,2 @@
+<!--pages/result.wxml-->
+<t-result style="margin-top:100rpx;"theme="{{result.theme}}" title="{{result.title}}" description="{{result.description}}" />
