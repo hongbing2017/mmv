@@ -30,16 +30,6 @@ app.use('/static',express.static(staticDir))
 
 
 //测试相关 
-//模拟一个用户, 登记回调
-
-const testUser = {
-  openID:'testfjl;ejaklejalfjealfjfa',
-  skey:'effeasjkl;fmaeeaopi9',
-  state: 0,
-  host: '',
-  callback:'test'
- }
-
 var captchaList = []
 
 //测试页面
@@ -48,8 +38,17 @@ var captchaList = []
 // 首页
 app.get("/", async (req, res) => {
 
-
   //模拟注册一个网站用户
+  let id = await nanoid()
+  const testUser = {
+    openID:'test'+id, 
+    skey:'testkey'+id,
+    state: 0,
+    host: '',
+    callback:'test'
+   }
+
+   
   let user = db.getUserByOpenID(testUser.openID)
   if (!user) {
       await db.addUser(testUser)
@@ -112,8 +111,9 @@ let regUrl = /^(http|https):\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(\/[a-zA-Z0-9/_.-]*
 
 // 验证二维码
 app.get("/mmv/verify", async (req, res) => {
+  const { token } = req.query
+
   console.log('验证二维码：',token)
-  const { token } = req.query;
   if (!token) {
     return res.send({
       code: 1,
