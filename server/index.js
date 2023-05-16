@@ -32,10 +32,21 @@ app.use('/static',express.static(staticDir))
 //测试相关 
 var captchaList = []
 
-//测试页面
-
+var testhtml = null
+let indexhtml= await 
 // 首页
-app.get("/", async (req, res) => {
+app.get("/",async(req,res)=>{
+    if(!indexhtml){
+      indexhtml = await fs.readFile(path.join(__dirname, "./static/index.html"),"utf-8")
+    }
+    res.send(indexhtml)
+})
+app.get("/captcha", async (req, res) => {
+
+  //测试页面
+  if(!testhtml){
+    testhtml = await fs.readFile(path.join(__dirname, "./captchatest.html"),"utf-8")
+  } 
 
   //模拟注册一个网站用户
   let id = await nanoid()
@@ -59,9 +70,8 @@ app.get("/", async (req, res) => {
 
   let qrcode = await getQrCode(scene,false)
 
-  //console.log('qrcode:',qrcode)
-  let html = await fs.readFile(path.join(__dirname, "./index.html"),"utf-8")
-  html = html.replace('#captcha#',qrcode)
+  //console.log('qrcode:',qrcode) 
+  testhtml.replace('#captcha#',qrcode)
   await db.addCode(scene,testUser.openID)
 
   let md5 = crypto.createHash('md5').update(qrcode).digest('hex');
