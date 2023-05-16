@@ -83,7 +83,7 @@ app.get("/mmv/captcha", async (req, res) => {
     state:0, //验证结果0=未验证，1=验证成功
     t:Date.now()
   })
-  res.send(html);
+  res.send(testhtml);
   
 });
 
