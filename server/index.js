@@ -71,7 +71,7 @@ app.get("/mmv/captcha", async (req, res) => {
   let qrcode = await getQrCode(scene,false)
 
   //console.log('qrcode:',qrcode) 
-  testhtml.replace('#captcha#',qrcode)
+  let html = testhtml.replace('#captcha#',qrcode)
   await db.addCode(scene,testUser.openID)
 
   let md5 = crypto.createHash('md5').update(qrcode).digest('hex');
@@ -83,7 +83,7 @@ app.get("/mmv/captcha", async (req, res) => {
     state:0, //验证结果0=未验证，1=验证成功
     t:Date.now()
   })
-  res.send(testhtml);
+  res.send(html);
   
 });
 
