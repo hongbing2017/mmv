@@ -85,7 +85,7 @@ app.get("/mmv/captchaResult", async (req, res) => {
   const {token}=req.query //验证二维码的MD5
   let timestamp= Date.now()
   captchaList.some((item,index)=>{
-    if(item.md5 ==  md5){
+    if(item.md5 ==  token){
       if(item.state==1){
         res.json({//通知前端验证成功
           code:0,
