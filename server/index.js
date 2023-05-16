@@ -33,7 +33,7 @@ app.use('/static',express.static(staticDir))
 var captchaList = []
 
 var testhtml = null
-let indexhtml= await 
+let indexhtml= null
 // 首页
 app.get("/",async(req,res)=>{
     if(!indexhtml){
