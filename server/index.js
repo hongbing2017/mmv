@@ -57,7 +57,7 @@ app.get("/", async (req, res) => {
   let scene = await nanoid();
   scene = scene.slice(0, 32) //微信限制在32位, 虽然nanoid生成的scene明显小于32
 
-  let qrcode = await getQrCode(scene,true)
+  let qrcode = await getQrCode(scene,false)
 
   //console.log('qrcode:',qrcode)
   let html = await fs.readFile(path.join(__dirname, "./index.html"),"utf-8")
@@ -167,7 +167,7 @@ app.get("/mmv/getqr", async (req, res) => {
   if (!skey) {
     return res.send({
       code: 1,
-      data: '无效skey',
+      data: '无效参数',
     });
   }
   let user = await db.getUser(skey)
@@ -181,19 +181,19 @@ app.get("/mmv/getqr", async (req, res) => {
   let limit = 500
   if(user.qrcount>user.verifycount+500){
     return res.send({
-      code: 1,
-      data: '申请的未使用二维码超过'+limit,
+      code: 2,
+      data: '拒绝：申请的未使用二维码超过'+limit,
     });
   }
   
   let scene = await nanoid();
   scene = scene.slice(0, 32) //微信限制在32位, 虽然nanoid生成的scene明显小于32
 
-  let qrcode = await getQrCode(scene,true)
+  let qrcode = await getQrCode(scene,false)
 
   if (!qrcode) {
     return res.send({
-      code: 1,
+      code: 3,
       data: '无法获取二维码',
     });
   }
@@ -201,7 +201,8 @@ app.get("/mmv/getqr", async (req, res) => {
     qrcount:user.qrcount+1
   })
   await db.addCode(code,user.openid)
-  console.log("qrcode legth:",qrcode.length)
+  
+  //console.log("qrcode legth:",qrcode.length)
   return res.send({
     code: 0,
     data: {
