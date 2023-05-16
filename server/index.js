@@ -35,12 +35,12 @@ var captchaList = []
 var testhtml = null
 let indexhtml= null
 // 首页
-app.get("/",async(req,res)=>{
-    if(!indexhtml){
-      indexhtml = await fs.readFile(path.join(__dirname, "./static/index.html"),"utf-8")
-    }
-    res.send(indexhtml)
-})
+// app.get("/",async(req,res)=>{
+//     if(!indexhtml){
+//       indexhtml = await fs.readFile(path.join(__dirname, "./index.html"),"utf-8")
+//     }
+//     res.send(indexhtml)
+// })
 app.get("/captcha", async (req, res) => {
 
   //测试页面
