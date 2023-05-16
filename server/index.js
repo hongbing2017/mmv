@@ -131,7 +131,7 @@ app.get("/mmv/verify", async (req, res) => {
   
   let callbackUrl = await db.verifyCode(token)
   
-  console.log('二维码回调：',callbackUrl)
+  console.log('二维码回调：',callbackUrl,captchaList)
 
   if(callbackUrl == 'test'){//测试页面的假回调，
       let r = captchaList.some((item)=>{
