@@ -135,6 +135,7 @@ app.get("/mmv/verify", async (req, res) => {
 
   if(callbackUrl == 'test'){//测试页面的假回调，
       let r = captchaList.some((item)=>{
+        console.log("item:",item)
         if(item.scene==token){
           item.state = 1  //验证通过
           return true
