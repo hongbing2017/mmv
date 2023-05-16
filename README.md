@@ -15,7 +15,7 @@
 
 人机验证小程序作为基础工具提供免费服务，小程序和后端代码都在此开源。
 
-在线演示：https://myfile.link/captcha
+在线演示：https://myfile.link/mmv/captcha
 
 # 如何在自己的网站中使用
 
