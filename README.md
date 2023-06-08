@@ -15,7 +15,7 @@
 
 人机验证小程序作为基础工具提供免费服务，小程序和后端代码都在此开源。
 
-在线演示：https://myfile.link/mmv/captcha
+在线演示：https://myfile.link/mmv/index
 
 # 如何在自己的网站中使用
 
@@ -49,7 +49,7 @@ API：https://myfile.link/getcaptcha?skey=xxxx (把xxx替换成你自己的skey)
 }
 ```
 
-收到二维码后，你首先计算qrcode的MD45值，然后和captcha一起保存在一个列表里，比如：
+收到二维码后，你首先计算qrcode的MD45值，然后和captcha一起保存在一个列表里，等待验证，比如：
 
 ```js
 let md5 = MD5(qrcode)
@@ -157,6 +157,7 @@ app.get("/captcha", async (req, res) => {
 人机验证的目的是防止机器人大规模薅羊毛或攻击，并不是网站提供服务所必须。
 
 所以，一旦偶发这种情况，这边建议你直接放行用户，也可以预先申请一定数量的二维码，人机验证小程序允许用户至多预先申请500个。
+
 
 **二维码可以重复使用吗**
 

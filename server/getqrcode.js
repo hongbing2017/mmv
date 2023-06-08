@@ -37,8 +37,8 @@ async function _GetQr(scene,bDev,n=1) {
             });
             res.on('end', async () => {
                 const contentType = res.headers['content-type'];
-                if (!contentType.includes('image')) {
-                    console.log('获取小程序码图片失败，微信api返回的json为：', JSON.parse(data))
+                if (!contentType || !contentType.includes('image')) {
+                    console.log('获取小程序码图片失败，微信api返回的json为：', data?JSON.parse(data):'null')
                     return resolve(0);
                 } else {
                     let d = Buffer.from(data, 'binary')

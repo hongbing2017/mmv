@@ -1,3 +1,5 @@
+var schedule = require('node-schedule');
+var tencentcos = require('./tencentcos.js')
 
 // 从环境变量中读取数据库配置
 const { MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_ADDRESS = "" } = process.env;
@@ -9,7 +11,7 @@ var knex = null
 
 // 数据库初始化方法
 async function initDB() {
-  console.log("开始初始化数据库:", MYSQL_USERNAME, MYSQL_PASSWORD, host,port)
+  //console.log("开始初始化数据库:", MYSQL_USERNAME, MYSQL_PASSWORD, host,port)
   try {
     knex = await require('knex')({
       client: 'mysql',
@@ -33,7 +35,7 @@ async function initDB() {
     await knex.schema.hasTable('userList').then(function (exists) {
       if (!exists) {
         console.log("创建表userList")
-        return knex.schema.createTable('userList', table => {
+        return knex.schema.createTable('userList', table => {         
           table.string('skey').primary() //用户api key
           table.string('openid').index()
           table.integer('state') //0=正常 1=异常 2=封禁
@@ -62,17 +64,114 @@ async function initDB() {
         })
       }
     })
+    
+    //等待上传确认, 避免文件上传了，但没有完成提交变成没有机会删除的死文件
+    await knex.schema.hasTable('uploadList').then(function (exists) {
+      if (!exists) {
+        console.log("创建表uploadList")
+        return knex.schema.createTable('uploadList', table => {
+          table.string('id').primary()
+          table.timestamp('create_time').defaultTo(knex.fn.now())
+        })
+      }
+    })
+
+    let day = 24 * 60 * 60 * 1000;
+    //await knex.schema.dropTableIfExists('fileList')
+
+    await knex.schema.hasTable('fileList').then(function (exists) {
+        if (!exists) {
+          console.log("创建表fileList")
+            return knex.schema.createTable('fileList', table => {
+              table.string('id').primary()
+              table.string('expireNum').defaultTo('') //限制每天访问次数，格式为：今天时间戳-次数
+              table.bigint('expireTime').defaultTo(Date.now()+day)
+              table.timestamp('create_time').defaultTo(knex.fn.now())
+            })
+          }
+    })
+
+    schedule.scheduleJob("0 0 0 * * *", async () => {
+       let list = await GetExpiredUploadIDList()
+       list.forEach(item => {
+          tencentcos.DelFile(`${item.id}.txt`)
+       }); 
+       await knex('fileList').where('expireTime','<',Date.now()).del()
+       await knex('userList').where('callback','test').limit(1000).del()
+    })
   } catch (error) {
     console.log("init database:",error)
   }
 
 }
+
+function AddUploadID(id){
+  return knex('uploadList').insert({id})
+}
+function DelUploadID(id){
+  return knex('uploadList').where('id',id).del()
+}
+function GetExpiredUploadIDList(){
+  //const expiredTime = Date.now() - 24 * 60 * 60 * 1000;
+  const expiredTime = Date.now() - 60 * 1000;
+  return knex('uploadList').where('create_time','<',expiredTime).select()
+}
+
+async function GetFile(id){
+  
+  let rows  = knex('fileList').where('id',id).select()
+  if(rows.length>0){
+    let r = rows[0]
+    console.log("访问文件：",r)
+    let curTime = new Date()
+    //先检查是否过期
+    if(r.expireTime < curTime.getTime()){
+      await  knex('fileList').where('id',id).del()
+      return false
+    }
+    //再检查是否超过访问次数
+    const today = new Date(curTime.getFullYear(), curTime.getMonth(), curTime.getDate());
+    const todayTimestamp = today.getTime();
+
+    let expireNum = r.expireNum.split('-')
+    if(!expireNum[0] ||todayTimestamp!=expireNum[0]){
+      await knex('fileList').where('id',id).update({
+        expireNum:todayTimestamp+'-'+239
+      })
+      return true
+    }
+
+    let n = Number(expireNum[1])
+    n--
+    if(n==0){
+      await  knex('fileList').where('id',id).del()
+    }else{
+      await knex('fileList').where('id',id).update({
+        expireNum:todayTimestamp+'-'+n
+      })
+    }
+    return true
+  }
+  return false
+}
+async function addFileDays(id,days){
+  let rows = await knex('fileList').where('id',id).select('expireTime')
+  if(rows[0]){
+    let t = rows[0].expireTime
+    t += days*24 * 60 * 60 * 1000;
+    return  knex('fileList').where('id',id).update({
+      expireTime:t
+    })
+  }
+}
 async function getUser(skey) {
+  if(!skey)return null
   let rows = await knex('userList').where('skey', skey).select()
   if (rows && rows[0]) return rows[0]
   return null
 }
 async function getUserByOpenID(openID) {
+  if(!openID)return null
   let rows = await knex('userList').where('openid', openID).select()
   if (rows && rows[0]) return rows[0]
   return null
@@ -122,5 +221,8 @@ module.exports = {
   addUser,
   addCode,
   delCode,
-  getCode
+  getCode,
+  AddUploadID,
+  DelUploadID,
+  GetFile
 };
