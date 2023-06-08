@@ -117,6 +117,11 @@ function GetExpiredUploadIDList(){
   return knex('uploadList').where('create_time','<',expiredTime).select()
 }
 
+async function AddFile(id){
+  return knex('fileList').insert({
+    id
+  })
+}
 async function GetFile(id){
   
   let rows  = knex('fileList').where('id',id).select()
@@ -154,7 +159,7 @@ async function GetFile(id){
   }
   return false
 }
-async function addFileDays(id,days){
+async function AddFileDays(id,days){
   let rows = await knex('fileList').where('id',id).select('expireTime')
   if(rows[0]){
     let t = rows[0].expireTime
@@ -224,5 +229,7 @@ module.exports = {
   getCode,
   AddUploadID,
   DelUploadID,
-  GetFile
+  AddFile,
+  GetFile,
+  AddFileDays
 };

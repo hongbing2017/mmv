@@ -206,7 +206,7 @@ app.get("/submit", async (req, res) => {
   console.log("submit id：", id)
 
   await db.DelUploadID(id)
-   
+  await db.AddFile(id)
   return res.json({
     code: 1
   })
