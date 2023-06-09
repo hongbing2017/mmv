@@ -77,7 +77,7 @@ async function initDB() {
     })
 
     let day = 24 * 60 * 60 * 1000;
-    await knex.schema.dropTableIfExists('fileList')
+    //await knex.schema.dropTableIfExists('fileList')
 
     await knex.schema.hasTable('fileList').then(function (exists) {
         if (!exists) {
