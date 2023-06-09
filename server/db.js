@@ -118,8 +118,10 @@ function GetExpiredUploadIDList(){
 }
 
 async function AddFile(id){
+  let day = 24 * 60 * 60 * 1000;
   return knex('fileList').insert({
-    id
+    id,
+    expireTime:Date.now()+day //默认24小时过期
   })
 }
 async function GetFile(id){
