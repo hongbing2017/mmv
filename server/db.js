@@ -124,7 +124,7 @@ async function AddFile(id){
 }
 async function GetFile(id){
   
-  let rows  = knex('fileList').where('id',id).select()
+  let rows  = await knex('fileList').where('id',id).select()
   if(rows.length>0){
     let r = rows[0]
     console.log("访问文件：",r)
