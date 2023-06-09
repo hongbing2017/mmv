@@ -218,15 +218,21 @@ app.get("/getfile", async (req, res) => {
   console.log("getfile id：", id)
   try {
     let r = await db.GetFile(id)
+    console.log("验证文件存在：",r)
     if(r){
-       let r = await tencent.GetFile(id+'.txt')
+      r = await tencent.GetFile(id+'.txt')
+      console.log("获取文件数据：",r)
       return res.send(r)
     } 
   } catch (error) {
     console.log("回取文件错误：",error)
+
   }
   
-  return res.send('')
+  return res.send({
+    code:0,
+    message:'无法访问指定ID的文件'
+  })
 });
 
 app.get("/mmv/getcaptcha", async (req, res) => {

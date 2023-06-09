@@ -127,7 +127,7 @@ async function GetFile(id){
   let rows  = await knex('fileList').where('id',id).select()
   if(rows.length>0){
     let r = rows[0]
-    console.log("访问文件：",r)
+    console.log("获取文件ID：",r.id)
     let curTime = new Date()
     //先检查是否过期
     if(r.expireTime < curTime.getTime()){
