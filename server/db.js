@@ -77,7 +77,7 @@ async function initDB() {
     })
 
     let day = 24 * 60 * 60 * 1000;
-    //await knex.schema.dropTableIfExists('fileList')
+    await knex.schema.dropTableIfExists('fileList')
 
     await knex.schema.hasTable('fileList').then(function (exists) {
         if (!exists) {
@@ -119,9 +119,11 @@ function GetExpiredUploadIDList(){
 
 async function AddFile(id){
   let day = 24 * 60 * 60 * 1000;
+  let expireTime = Date.now()+day //默认24小时过期
+  console.log("文件过期时间：",expireTime)
   return knex('fileList').insert({
     id,
-    expireTime:Date.now()+day //默认24小时过期
+    //expireTime
   })
 }
 async function GetFile(id){
