@@ -131,6 +131,7 @@ async function GetFile(id){
     let curTime = new Date()
     //先检查是否过期
     if(r.expireTime < curTime.getTime()){
+      console.log("文件过期：",r.expireTime, curTime.getTime())
       await  knex('fileList').where('id',id).del()
       return false
     }
