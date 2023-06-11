@@ -40,8 +40,11 @@ setInterval(()=>{
   for(let i=_captchaList.length-1; i>=0; i--){ //倒序遍历方便删除操作
     let item = _captchaList[i]
     if(item.state){
-      if(item.resolve)item.resolve(1)
-      _captchaList.splice(i,1)
+      if(item.resolve){
+        item.resolve(1)
+        item.resolve = null
+      }
+      //_captchaList.splice(i,1)
     }
     else if (item.t + 600000 < timestamp) {//超时10分钟删除 
       if(item.resolve)item.resolve(-1)
@@ -142,14 +145,6 @@ app.get("/requestAuth", async (req, res) => {
 
   let md5 = crypto.createHash('md5').update(qrcode).digest('hex');
 
-  //预防同一个二维码询问多次
-  _captchaList.some((item,index) => {
-    if (item.md5 == md5) {
-      if(item.resolve)item.resolve(0)
-      _captchaList.splice(index,1)
-      return true
-    }
-  })
   _captchaList.push({
     md5,
     scene,
@@ -189,8 +184,11 @@ app.get("/captcharesult", async (req, res) => {
   req.on('close', function() {
     _captchaList.some((item,index) => {
       if (item.md5 == token) {
-        if(item.resolve)item.resolve(0)
-        //_captchaList.splice(index,1)
+        if(item.resolve){
+          item.resolve(0)
+          item.resolve=null
+        }
+        //_captchaList.splice(index,1) 不能删除，因为客户端可能会重新发起连接询问
         return true
       }
     })
