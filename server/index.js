@@ -189,6 +189,7 @@ app.get("/captcharesult", async (req, res) => {
   });
 
   //在这等着扫码验证，连接超时关闭客户端会重新发
+  console.log("等待扫码验证")
   let r = await new Promise(resolve=>{
     _captchaList.some( (item) => {
       if (item.md5 == token) {
@@ -198,6 +199,7 @@ app.get("/captcharesult", async (req, res) => {
     })
   })
 
+  console.log("扫码验证完成：",r)
   if(!r)return //注意，连接超时断连不回复，客户端会重新发询问
 
   if(r==-1){ //二维码超时则通知前端刷新二维码
@@ -219,6 +221,7 @@ app.get("/captcharesult", async (req, res) => {
       })
   }
     
+  console.log("返回询问结果：true")
   return res.json({//通知前端验证成功,并且附上
     code: 0,
     result: 1,
