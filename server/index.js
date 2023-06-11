@@ -40,8 +40,7 @@ setInterval(()=>{
   for(let i=_captchaList.length-1; i>=0; i--){ //倒序遍历方便删除操作
     let item = _captchaList[i]
     if(item.state){
-      console.log("调用resove:",item)
-      if(item.resove)item.resove(1)
+      if(item.resolve)item.resolve(1)
       _captchaList.splice(i,1)
     }
     else if (item.t + 600000 < timestamp) {//超时10分钟删除 
@@ -49,7 +48,6 @@ setInterval(()=>{
       _captchaList.splice(i, 1)
     }
   }
-  console.log("扫码结果轮询")
 },1000)
 
 var testhtml = null
@@ -59,10 +57,6 @@ app.get("/", async (req, res) => {
   if (!indexhtml) {
     indexhtml = await fs.readFile(path.join(__dirname, "./index.html"), "utf-8")
   }
-    //对象上传授权
-    console.log("开始对象存储授权")
-    let result = await tencent.TencentCosAuth()
-    console.log("对象存储授权结果：",result)
   res.send(indexhtml)
 })
 app.get("/mmv/index", async (req, res) => {
