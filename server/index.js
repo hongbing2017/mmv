@@ -40,6 +40,7 @@ setInterval(()=>{
   for(let i=_captchaList.length-1; i>=0; i--){ //倒序遍历方便删除操作
     let item = _captchaList[i]
     if(item.state){
+      console.log("调用resove:",item)
       if(item.resove)item.resove(1)
       _captchaList.splice(i,1)
     }
@@ -48,6 +49,7 @@ setInterval(()=>{
       _captchaList.splice(i, 1)
     }
   }
+  console.log("扫码结果轮询")
 },1000)
 
 var testhtml = null
