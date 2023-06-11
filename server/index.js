@@ -174,11 +174,23 @@ app.get("/captcharesult", async (req, res) => {
   const { token } = req.query //验证二维码的MD5
   console.log("captcharesult token：", token)
 
+  let bHas = _captchaList.some( (item) => {
+    if (item.md5 == token) {
+      return true
+    }
+  })
+
+  if(!bHas){
+    return res.json({
+      code: 1,  //code=1表示刷新
+      result: 0
+    })
+  }
   req.on('close', function() {
     _captchaList.some((item,index) => {
       if (item.md5 == token) {
         if(item.resolve)item.resolve(0)
-        _captchaList.splice(index,1)
+        //_captchaList.splice(index,1)
         return true
       }
     })
@@ -307,7 +319,7 @@ app.get("/mmv/captchaResult", async (req, res) => {
     _captchaList.some((item,index) => {
       if (item.md5 == token) {
         if(item.resolve)item.resolve(0)
-        _captchaList.splice(index,1)
+        //_captchaList.splice(index,1)
         return true
       }
     })
