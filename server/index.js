@@ -32,9 +32,23 @@ app.use('/static', express.static(staticDir))
 var myfileSkey = 'CILcYztUXsKJe8FAGwC8i'
 
 //等待验证的二维码 针对myfile.link应用
-var captchaList = []
+var _captchaList = []
 
-
+//采用长轮询方案，由服务器定时统一检查回应扫码结果，而不是客户端定时询问
+setInterval(()=>{
+  let timestamp = Date.now()
+  for(let i=_captchaList.length-1; i>=0; i--){ //倒序遍历方便删除操作
+    let item = _captchaList[i]
+    if(item.state){
+      if(item.resove)item.resove(1)
+      _captchaList.splice(i,1)
+    }
+    else if (item.t + 600000 < timestamp) {//超时10分钟删除 
+      if(item.resolve)item.resolve(-1)
+      _captchaList.splice(i, 1)
+    }
+  }
+},1000)
 
 var testhtml = null
 let indexhtml = null
@@ -85,7 +99,7 @@ app.get("/mmv/index", async (req, res) => {
   let md5 = crypto.createHash('md5').update(qrcode).digest('hex');
 
   console.log("生成一个二维码验证：", md5, scene)
-  captchaList.push({
+  _captchaList.push({
     md5,
     scene,
     state: 0, //验证结果0=未验证，1=验证成功
@@ -132,8 +146,15 @@ app.get("/requestAuth", async (req, res) => {
 
   let md5 = crypto.createHash('md5').update(qrcode).digest('hex');
 
-  //console.log("生成一个二维码验证：", md5, scene)
-  captchaList.push({
+  //预防同一个二维码询问多次
+  _captchaList.some((item,index) => {
+    if (item.md5 == md5) {
+      if(item.resolve)item.resolve(0)
+      _captchaList.splice(index,1)
+      return true
+    }
+  })
+  _captchaList.push({
     md5,
     scene,
     state: 0, //验证结果0=未验证，1=验证成功
@@ -157,45 +178,51 @@ app.get("/captcharesult", async (req, res) => {
   const { token } = req.query //验证二维码的MD5
   console.log("captcharesult token：", token)
 
-  let timestamp = Date.now()
-  let r = captchaList.some(async (item, index) => {
-    if (item.md5 == token) {
-      if (item.state == 1) {
-       
-        captchaList.splice(index, 1)
-
-        //对象上传授权
-        console.log("开始对象存储授权")
-        let result = await tencent.TencentCosAuth(token)
-        console.log("对象存储授权结果：",!!result)
-
-        if(!result){
-            return res.json({
-              code: 0,
-              result: 0
-            })
-        }
-        return res.json({//通知前端验证成功,并且附上
-            code: 0,
-            result: 1,
-            data:result
-        })
-      } else {
-        res.json({
-          code: 0,
-          result: 0
-        })
+  req.on('close', function() {
+    _captchaList.some((item,index) => {
+      if (item.md5 == token) {
+        if(item.resolve)item.resolve(0)
+        _captchaList.splice(index,1)
+        return true
       }
-      return true
-    } else {
-      if (item.t + 600000 > timestamp) {//超时10分钟删除 
-        captchaList.splice(index, 1)
+    })
+  });
+
+  //在这等着扫码验证，连接超时关闭客户端会重新发
+  let r = await new Promise(resolve=>{
+    _captchaList.some( (item) => {
+      if (item.md5 == token) {
+        item.resolve=resolve
+        return true
       }
-    }
+    })
   })
-  if(!r)return res.json({
+
+  if(!r)return //注意，连接超时断连不回复，客户端会重新发询问
+
+  if(r==-1){ //二维码超时则通知前端刷新二维码
+    return res.json({
+      code: 1,  //code=1表示刷新
+      result: 0
+    })
+  }
+
+  //对象上传授权
+  console.log("开始对象存储授权")
+  let result = await tencent.TencentCosAuth(token)
+  console.log("对象存储授权结果：",!!result)
+
+  if(!result){
+      return res.json({
+        code: 0,
+        result: 0
+      })
+  }
+    
+  return res.json({//通知前端验证成功,并且附上
     code: 0,
-    result: 0
+    result: 1,
+    data:result
   })
 });
 
@@ -257,7 +284,7 @@ app.get("/mmv/getcaptcha", async (req, res) => {
   let md5 = crypto.createHash('md5').update(qrcode).digest('hex');
 
   console.log("生成一个二维码验证：", md5, scene)
-  captchaList.push({
+  _captchaList.push({
     md5,
     scene,
     state: 0, //验证结果0=未验证，1=验证成功
@@ -277,26 +304,38 @@ app.get("/mmv/getcaptcha", async (req, res) => {
 app.get("/mmv/captchaResult", async (req, res) => {
   const { token } = req.query //验证二维码的MD5
   console.log("captchaResult token：", token)
-  let timestamp = Date.now()
-  captchaList.some((item, index) => {
-    if (item.md5 == token) {
-      if (item.state == 1) {
-        res.json({//通知前端验证成功
-          code: 0,
-          result: 1
-        })
-        captchaList.splice(index, 1)
-      } else {
-        res.json({
-          code: 0,
-          result: 0
-        })
+  req.on('close', function() {
+    _captchaList.some((item,index) => {
+      if (item.md5 == token) {
+        if(item.resolve)item.resolve(0)
+        _captchaList.splice(index,1)
+        return true
       }
-    } else {
-      if (item.t + 600000 > timestamp) {//超时10分钟删除 
-        captchaList.splice(index, 1)
+    })
+  });
+
+  //在这等着扫码验证，连接超时关闭客户端会重新发
+  let r = await new Promise(resolve=>{
+    _captchaList.some( (item) => {
+      if (item.md5 == token) {
+        item.resolve=resolve
+        return true
       }
-    }
+    })
+  })
+
+  if(!r)return //注意，超时断连不回复，客户端会重新发询问
+
+  if(r==-1){ //超时则通知前端刷新二维码
+    return res.json({
+      code: 1,  //code=1表示刷新
+      result: 0
+    })
+  }
+
+  return res.json({
+    code: 0,
+    result: 1
   })
 });
 
@@ -317,7 +356,7 @@ app.get("/mmv/verify", async (req, res) => {
 
   let callbackUrl = await db.verifyCode(token)
 
-  console.log('二维码回调：', callbackUrl, captchaList)
+  console.log('二维码回调：', callbackUrl, _captchaList)
 
   if(!callbackUrl) {
     return res.send({
@@ -326,7 +365,7 @@ app.get("/mmv/verify", async (req, res) => {
     });
   }
   if (callbackUrl == 'test') {//测试页面的假回调，
-    let r = captchaList.some((item) => {
+    let r = _captchaList.some((item) => {
       console.log("item:", item)
       if (item.scene == token) {
         item.state = 1  //验证通过
@@ -347,7 +386,7 @@ app.get("/mmv/verify", async (req, res) => {
   }else if(callbackUrl.indexOf('myfile.link') != 0){
     
     await db.delCode(token)
-    let r = captchaList.some((item) => {
+    let r = _captchaList.some((item) => {
       console.log("item:", item)
       if (item.scene == token) {
         item.state = 1  //验证通过

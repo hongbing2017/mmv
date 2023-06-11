@@ -205,8 +205,7 @@
             <div class="alert alert-warning" role="alert">
               <i class="fas fa-check-circle mr-2"></i>二维码超时过期
             </div>
-            <small class="card-text"
-              style="display: flex; justify-content: center; margin-top: 8px">请刷新网页重新扫码</small>
+            <small class="card-text" style="display: flex; justify-content: center; margin-top: 8px">请刷新网页重新扫码</small>
           </div>
         </div>
       </div>
@@ -255,34 +254,49 @@
   init();
   async function init() {
 
-    //计算二维码图片的MD5值作为访问凭据
+    //二维码图片的MD5值作为询问扫码结果的凭据
     const srcValue = $('#qrimage').attr('src'); // 获取指定的img元素
     _captchaMD5 = md5(srcValue)
 
     console.log("_captchaMD5:", _captchaMD5)
 
     let url = "/mmv/captchaResult?token=" + _captchaMD5
-    let n = 0
-    let t = setInterval(() => {
-      //这里只是周期性的询问二维码是否得到验证
-      $.ajax(url, {
-        method: "get",
-      }).done(function (res) {
-        if (res && res.code == 0 && res.result==1) {
-          clearInterval(t)
-          $('#qrcode').hide()
-          $('#timeout').hide()
-          $('#result').show()
-        }
-      });
-      n++
-      if(n>40){
-        clearInterval(t)
-        $('#qrcode').hide()
-        $('#timeout').show()
-      }
-    }, 1500)
 
+    async function query() {
+      let response = await fetch(url);
+
+      if (response.status == 502) {
+        // 状态 502 是连接超时错误，
+        // 连接挂起时间过长时可能会发生，
+        // 远程服务器或代理会关闭它
+        // 让我们重新连接
+        return await query();
+      } else if (response.status != 200) {
+        // 一个 error —— 让我们显示它
+        console.log("询问扫码错误：",response.statusText);
+        // 一秒后重新连接
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return await query();
+      } else {
+        // 获取并显示消息
+        return await response.json();
+      }
+    }
+
+    let r = await query()
+    console.log("询问结果：",r)
+
+    if(r.code==1){//二维码超时,需要刷新网页重新获取
+      $('#qrcode').hide()
+      $('#timeout').show()
+      return 
+    }
+    
+    if(res.result){
+      $('#qrcode').hide()
+      $('#timeout').hide()
+      $('#result').show()
+    }
   }
 </script>
 
