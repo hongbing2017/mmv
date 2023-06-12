@@ -195,7 +195,7 @@ app.get("/captcharesult", async (req, res) => {
   });
 
   //在这等着扫码验证，连接超时关闭客户端会重新发
-  console.log("等待扫码验证")
+  //console.log("等待扫码验证")
   let r = await new Promise(resolve=>{
     _captchaList.some( (item) => {
       if (item.md5 == token) {
@@ -205,7 +205,7 @@ app.get("/captcharesult", async (req, res) => {
     })
   })
 
-  console.log("扫码验证完成：",r)
+  //console.log("扫码验证完成：",r)
   if(!r)return //注意，连接超时断连不回复，客户端会重新发询问
 
   if(r==-1){ //二维码超时则通知前端刷新二维码
@@ -227,7 +227,6 @@ app.get("/captcharesult", async (req, res) => {
       })
   }
     
-  console.log("返回询问结果：true")
   return res.json({//通知前端验证成功,并且附上
     code: 0,
     result: 1,
@@ -313,10 +312,27 @@ app.get("/mmv/getcaptcha", async (req, res) => {
 app.get("/mmv/captchaResult", async (req, res) => {
   const { token } = req.query //验证二维码的MD5
   console.log("captchaResult token：", token)
+
+  let bHas = _captchaList.some( (item) => {
+    if (item.md5 == token) {
+      return true
+    }
+  })
+
+  if(!bHas){
+    return res.json({
+      code: 1,  //code=1表示刷新
+      result: 0
+    })
+  }
+
   req.on('close', function() {
     _captchaList.some((item,index) => {
       if (item.md5 == token) {
-        if(item.resolve)item.resolve(0)
+        if(item.resolve){
+          item.resolve(0)
+          item.resolve=null
+        }
         //_captchaList.splice(index,1)
         return true
       }
